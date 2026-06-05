@@ -476,9 +476,13 @@ static void qcom_va_md_minidump_registration(void)
 	va_md_data.md_entry.size = ALIGN(va_md_data.md_entry.size, 4);
 
 	if (msm_minidump_add_region(&va_md_data.md_entry) < 0) {
-		pr_err("Failed to register VA driver CMA region with minidump\n");
-		va_md_data.va_md_minidump_reg = false;
-		return;
+		if (md_get_region(va_md_data.md_entry.name)) {
+			pr_info("VA driver region already registered with minidump\n");
+		} else {
+			pr_err("Failed to register VA driver CMA region with minidump\n");
+			va_md_data.va_md_minidump_reg = false;
+			return;
+		}
 	}
 
 	va_md_data.va_md_minidump_reg = true;
